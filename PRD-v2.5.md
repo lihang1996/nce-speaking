@@ -6,7 +6,7 @@
 > 状态：正式设计稿，尚未开发或实测  
 > 平台：Android 手机，原生 App  
 > 范围：个人自用；首发新概念英语第一册，美音  
-> 配套文档：[技术方案](docs/技术方案.md)（v1.1 对应 PRD v2.2，尚未同步至本版）；[UI 设计稿](design/ui-mockups.html)（尚未同步至本版）
+> 配套文档：[技术方案](docs/技术方案.md)（v1.1 对应 PRD v2.2，尚未同步至本版）；[UI 设计稿](design/ui-prototype/index.html)（46 个页面状态，清晨留白风格）
 
 ## 0. 阅读说明
 
@@ -304,7 +304,7 @@ M1 和 M2 的功能合称 P0，是首版必须有的功能。**M1 做完就开�
 
 ### 4.3 关键页面草图
 
-以下草图只表示内容和布局。完整的视觉设计稿见 [design/ui-mockups.html](design/ui-mockups.html)，共 46 个页面。
+以下草图只表示内容和布局。完整的视觉设计稿见 [design/ui-prototype](design/ui-prototype/)，共 46 个页面状态；本地运行 `npm run dev` 后可点击体验主要流程。
 
 **今日页**
 
