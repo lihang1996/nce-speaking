@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>每日开口 · 新视觉方案 · 核心页</title>
+<title>每日开口 · 新视觉方案 · 全部页面</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..600&family=Plus+Jakarta+Sans:wght@400..800&display=swap">
@@ -15,19 +15,24 @@
   <header class="board-head">
     <div>
       <h1>每日开口 · 新视觉方案</h1>
-      <p>核心页 6 屏加“学习颜色”设置，按真实 390 × 844 尺寸绘制。四种学习活动各用一种颜色：听（蓝）、说（珊瑚）、练（紫）、复习（绿），用户可以在设置里换；英文课文用衬线字体，主按钮统一为黑色。</p>
+      <p>全部 47 屏，按真实 390 × 844 尺寸绘制，按使用流程分 6 组。四种学习活动各用一种颜色：听（蓝）、说（珊瑚）、练（紫）、复习（绿）；在“设置与账号 · 学习颜色”里点选颜色，整板实时换色。英文课文用衬线字体，主按钮统一为黑色。未标阶段的页面都属于 M1。</p>
     </div>
-    <span class="tag">PRD v2.5.5 · 第二轮</span>
+    <span class="tag">PRD v2.5.6</span>
   </header>
-  <section class="screens" id="screens"></section>
+  <div id="groups"></div>
   <section id="spec"></section>
 </main>
 <script type="module">
 import { screens, spec, PALETTES, CVD } from './src/v2/screens.js';
+import { pages, groups } from './src/v2/pages.js';
+// 用法：v2.html 看全部；?only=login,today 只看指定页面；?only=spec 只看样式规范
+const byId = Object.fromEntries([...screens, ...pages].map(s => [s.id, s]));
+const cell = s => `<div><p class="cap"><b>${s.name}</b> · ${s.note}${s.stage ? `<span class="stg">${s.stage}</span>` : ''}</p>${s.render()}</div>`;
 const only = new URLSearchParams(location.search).get('only');
-const list = only ? screens.filter(s => only.split(',').includes(s.id)) : screens;
-if (only === 'spec') document.getElementById('screens').remove();
-document.getElementById('screens')?.insertAdjacentHTML('beforeend', list.map(s => `<div><p class="cap"><b>${s.name}</b> · ${s.note}</p>${s.render()}</div>`).join(''));
+const box = document.getElementById('groups');
+if (only === 'spec') box.remove();
+else if (only) box.innerHTML = `<section class="screens">${only.split(',').map(id => byId[id]).filter(Boolean).map(cell).join('')}</section>`;
+else box.innerHTML = groups.map(([t, ids]) => `<section class="grp"><h2>${t}<span>${ids.length} 屏</span></h2><div class="screens">${ids.map(id => cell(byId[id])).join('')}</div></section>`).join('');
 if (!only || only === 'spec') document.getElementById('spec').innerHTML = spec();
 // 学习颜色：点预设实时改全局颜色变量，所有屏幕一起变
 const root = document.documentElement;

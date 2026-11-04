@@ -1,4 +1,4 @@
-// 新视觉方案 · 核心页（PRD v2.5.5）。尺寸按 Android 390 × 844 dp，1px = 1dp。
+// 新视觉方案 · 核心页（PRD v2.5.6）。尺寸按 Android 390 × 844 dp，1px = 1dp。其余页面在 pages.js，共用这里的组件。
 const sbar = () => `<div class="sbar"><span>16:20</span><span class="ic"><i class="ti ti-wifi"></i><i class="ti ti-antenna-bars-5"></i><i class="ti ti-battery-3"></i></span></div>`;
 
 const nav = (on) => `<nav class="nav">${[['today', '今日', 'ti-sun'], ['courses', '课程', 'ti-books'], ['speaking', '口语', 'ti-messages'], ['review', '复习', 'ti-cards']]
@@ -22,6 +22,8 @@ const LINES = [
   ['B', 'Yes, it is.', ''],
   ['B', 'Thank you very much.', ''],
 ];
+
+export { sbar, nav, abar, segs, LINES };
 
 export const screens = [
   {
@@ -54,7 +56,7 @@ ${abar('第 1 课', '<button class="ibtn" aria-label="原书页"><i class="ti ti
 <div class="lhero"><span class="eyebrow" style="color:var(--listen-deep)">听读 · 美音原声</span><h1 class="lt en">Excuse me!</h1>
 <div class="q"><span class="k">听力问题</span><span class="v en">Whose handbag is it?</span></div></div></div>
 <div class="body">
-  <div class="dl-head"><b>课文 · 7 句</b><span class="chip sm"><i class="ti ti-language"></i>中文：点开</span></div>
+  <div class="dl-head"><b>课文 · 7 句</b><span class="chips"><span class="chip sm"><i class="ti ti-eye-off"></i>先听后看</span><span class="chip sm"><i class="ti ti-language"></i>中文：点开</span></span></div>
   ${LINES.map(([r, en, zh], i) => `<div class="line${i === 2 ? ' cur' : ''}"><span class="av ${r.toLowerCase()}${i === 2 ? ' solid' : ''}">${r}</span><div class="tx2"><div class="en">${en}</div>${zh ? `<small>${zh}</small>` : ''}</div>${i === 2 ? '<i class="ti ti-volume pl"></i>' : ''}</div>`).join('')}
 </div>
 <div class="player">
