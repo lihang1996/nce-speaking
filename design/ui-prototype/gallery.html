@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>每日开口 · 全部页面一览</title>
+<link rel="stylesheet" href="./src/style.css">
+<style>
+body{background:oklch(0.955 0.01 180);padding:16px}
+.g{display:grid;gap:18px 14px}
+.cell .lb{font-size:11px;color:var(--muted);margin:0 0 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cell .wrap{overflow:hidden}
+.cell .device{transform-origin:0 0;box-shadow:none}
+</style>
+</head>
+<body>
+<div class="g" id="g"></div>
+<script type="module">
+// 用法：gallery.html 显示全部页面；?s=1 原尺寸；?from=30&n=18 显示一段；?ids=today,review 只看指定页面
+import { screens } from './src/screens.js';
+const q = new URLSearchParams(location.search);
+const sc = Number(q.get('s') || 0.5294);
+const from = Number(q.get('from') || 0), count = Number(q.get('n') || screens.length);
+const ids = q.get('ids') ? q.get('ids').split(',') : null;
+const picked = ids
+  ? ids.map(id => screens.findIndex(s => s.id === id)).filter(i => i >= 0)
+  : screens.map((_, i) => i).slice(from, from + count);
+document.head.insertAdjacentHTML('beforeend', `<style>.g{grid-template-columns:repeat(auto-fill,${340 * sc}px)}.cell,.cell .wrap{width:${340 * sc}px}.cell .wrap{height:${736 * sc}px;border-radius:${36 * sc}px}.cell .device{transform:scale(${sc})}</style>`);
+document.getElementById('g').innerHTML = picked.map(i => `<div class="cell"><p class="lb">${String(i + 1).padStart(2, '0')} ${screens[i].name}</p><div class="wrap"><div class="device">${screens[i].render()}</div></div></div>`).join('');
+</script>
+</body>
+</html>
