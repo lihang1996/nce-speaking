@@ -1,6 +1,6 @@
 # 数据模型、事务与版本演进
 
-> 架构 v1.1 配套，基于 PRD v2.5.7。本文是实现契约草案，不是已创建的数据库。名称表达实体含义，最终 Room 类名可遵循项目命名规范。
+> 架构 v1.2 配套，基于 PRD v2.5.8。本文是实现契约草案，不是已创建的数据库。名称表达实体含义，最终 Room 类名可遵循项目命名规范。
 
 ## 1. 存储布局
 
@@ -220,7 +220,7 @@ S1 项目：D2 有相关学习 → D3 独立作答与核对 → D4 词句本主�
 | l2_exposure | variantId、lastReferenceSeenDay、lastReferenceSeenEventSeq；可用于七日重用判断 |
 | l2_current_evidence | unitId、goalId、definitionVersion、currentAttemptId、isSuccessful |
 | unit_status | unitId、targetSetVersionId、firstLearningComplete、eligibleCount、totalCount、validL2、status、evidenceAt |
-| study_session | sessionId、startedAt、learningDay、zoneId、endedAt、durationMonotonicMs；learningDay 在开始时确定，这次学习中新建的轮次与事件沿用 |
+| study_session | sessionId、startedAt、learningDay、zoneId、endedAt、durationMonotonicMs；跨过 0:00 的学习按自然日拆成两段统计 |
 | daily_plan | profileId、learningDay、durationChoice、ruleVersion、planVersion、mode |
 | plan_task | taskId、planId、type、lessonId、estimatedMinutes、progress、unavailableReason |
 | daily_quota | profileId、learningDay、defaultDistinctUsed、defaultReviewDuration、retryDistinctUsed |
