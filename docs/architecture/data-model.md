@@ -1,6 +1,6 @@
 # 数据模型、事务与版本演进
 
-> 架构 v1.0 配套，基于 PRD v2.5.7。本文是实现契约草案，不是已创建的数据库。名称表达实体含义，最终 Room 类名可遵循项目命名规范。
+> 架构 v1.1 配套，基于 PRD v2.5.7。本文是实现契约草案，不是已创建的数据库。名称表达实体含义，最终 Room 类名可遵循项目命名规范。
 
 ## 1. 存储布局
 
@@ -22,20 +22,21 @@ App 私有目录/
 
 | 标识 | 含义 | 稳定性 |
 |---|---|---|
+| profileId | 本机学习档案，一台手机同一时间只有一个 | 不等于后端 userId；换号或恢复备份时重新绑定 |
 | textbookId | 教材系列，如新概念 | 与中文标题、目录名解耦 |
 | volumeId | 册／资料范围 | 不因重装或改名改变 |
 | unitId | 单元 | 由包声明，两课／一课结构均支持 |
 | lessonId、sentenceId | 课与句 | 不用数组位置作主键，重排不变 |
 | canonicalItemId | 经过确认的词义／句义／短语身份 | 不是英文小写字符串；同形异义不同 ID |
 | shareScopeId | 状态共享范围 | 首版限定已明确的第一册；跨册共享策略以后决定 |
-| definitionId | 一个具体考核定义 | canonicalItem＋primaryAbility＋有效答案定义＋共享范围 |
+| definitionId | 一个具体考核定义 | shareScope＋canonicalItem＋primaryAbility＋definitionVersion |
 | targetSetVersionId | 单元标准／自定义目标集合版本 | 成员变更生成新版本 |
 | roundId、commandId | 一轮学习与一次用户命令 | 在进程重启和备份恢复后保留 |
 | eventId、eventSeq | 事实唯一标识与本地提交顺序 | ID 可跨备份识别，Seq 在档案内递增 |
 | requestId | 一次可能付费的服务调用 | 与服务商 request ID 分开保存 |
 | profileEpoch | 本机档案生命周期 | 换号、恢复、清除时递增，隔离旧回调 |
 
-`packageVersion` 表示资料发行，`definitionVersion` 表示有效答案／能力，`ruleVersion` 表示排期规则，`schemaVersion` 表示数据库结构。四者不能互相代替。
+`packageVersion` 表示资料发行，`packSchemaVersion` 表示资料包格式，`definitionVersion` 表示有效答案／能力，`ruleVersion` 表示排期规则，`dbSchemaVersion` 表示数据库结构，`backupVersion` 表示备份格式。它们各自独立，不能互相代替。
 
 跨册未来可以通过显式映射合并状态；首版只保留足够身份信息，不提前把不同册同拼写单词合并。跨课已确认的同义、同能力、同定义则按 PRD 共享。
 
@@ -73,7 +74,7 @@ erDiagram
 |---|---|---|
 | textbook | textbookId、title、sourceType | PK textbookId |
 | volume | volumeId、textbookId、order、title、accent、activePackageVersion | FK textbook；按教材顺序索引 |
-| package_install | installId、packageId、version、schemaVersion、hash、state、stagingPath | 同包版本不可重复激活；记录故障恢复阶段 |
+| package_install | installId、packageId、version、packSchemaVersion、hash、source、state、stagingPath | 同包版本不可重复激活；记录故障恢复阶段；source 首版只有本地文件 |
 | unit | unitId、volumeId、order、title、completionPolicy | unique(volumeId, unitId)；数量由实际行生成 |
 | lesson | lessonId、volumeId、order、kind、title、readiness | 同册顺序唯一，类型明确声明 |
 | unit_lesson | unitId、lessonId、required、order | 组合 PK；不按奇偶号隐式建立关系 |
@@ -104,11 +105,11 @@ erDiagram
 
 ### 5.1 REVIEW_DEFINITION
 
-字段至少包括：definitionId、shareScopeId、canonicalItemId、primaryAbility、answerVersion、promptDefinition、answerDefinition、contentFingerprint、createdAt、retiredAt。
+字段至少包括：definitionId、shareScopeId、canonicalItemId、primaryAbility、definitionVersion、promptDefinition、answerDefinition、contentFingerprint、createdAt、retiredAt。
 
-primaryAbility 只允许 `ORAL_RECALL / LISTEN_AND_ANSWER / SHADOW_FLUENCY`。`canonicalItemId` 不能只用 `lowercase(word)`，词义和短语整体由内容制作确认。`excuse me` 是一个短语项目；用户另外加入 excuse 时是另一项目。
+primaryAbility 只允许 `ORAL_RECALL / LISTEN_AND_ANSWER / SHADOW_FLUENCY`，依次对应 PRD 的看中文说英文、听懂并回答、跟原声读顺。`SHADOW_FLUENCY` 项目没有答案定义，不使用三个答案入口，不进入 target_member，也不产生 item_evidence。`canonicalItemId` 不能只用 `lowercase(word)`，词义和短语整体由内容制作确认。`excuse me` 是一个短语项目；用户另外加入 excuse 时是另一项目。
 
-对 `(shareScopeId, canonicalItemId, primaryAbility, answerVersion)` 唯一。`item_source` 保存 definition 与课、例句、题目和引入原因的多对多关系，重复入队执行“补来源＋保留状态”。
+对 `(shareScopeId, canonicalItemId, primaryAbility, definitionVersion)` 唯一。`item_source` 保存 definition 与课、例句、题目和引入原因的多对多关系，重复入队执行“补来源＋保留状态”。
 
 ### 5.2 REVIEW_STATE
 
@@ -139,6 +140,8 @@ primaryAbility 只允许 `ORAL_RECALL / LISTEN_AND_ANSWER / SHADOW_FLUENCY`。`c
 | 页面恢复 | presentationPhase、paused、selectedPrompt、evaluationSource、evaluationResult |
 | 正式资格 | dueDayAtOpen、formalEligibilityReason、quotaReservationId |
 | 结算 | settlementId、settledAt、closeReason |
+
+roundKind 取 `FIRST_LEARNING / FORMAL_DUE / FORMAL_RECHECK / TRAINING / SAME_DAY_RETRY`，与总体设计 6.3 的五种轮次一一对应。轮次上的 `definitionVersion` 是开轮时的快照，只用于审计；定义身份以 definitionId 为准。暂停只置 `paused`，不改 `presentationPhase`。
 
 `dueDayAtOpen` 只审计，不驱动后续推荐。唯一索引约束同一 profile＋definition 最多一个 closedAt 为空的轮次。Settlement 的 roundId 唯一；重试相同 commandId 不再追加相同事件。
 
@@ -217,7 +220,7 @@ S1 项目：D2 有相关学习 → D3 独立作答与核对 → D4 词句本主�
 | l2_exposure | variantId、lastReferenceSeenDay、lastReferenceSeenEventSeq；可用于七日重用判断 |
 | l2_current_evidence | unitId、goalId、definitionVersion、currentAttemptId、isSuccessful |
 | unit_status | unitId、targetSetVersionId、firstLearningComplete、eligibleCount、totalCount、validL2、status、evidenceAt |
-| study_session | sessionId、startedAt、learningDay、zoneId、endedAt、durationMonotonicMs |
+| study_session | sessionId、startedAt、learningDay、zoneId、endedAt、durationMonotonicMs；learningDay 在开始时确定，这次学习中新建的轮次与事件沿用 |
 | daily_plan | profileId、learningDay、durationChoice、ruleVersion、planVersion、mode |
 | plan_task | taskId、planId、type、lessonId、estimatedMinutes、progress、unavailableReason |
 | daily_quota | profileId、learningDay、defaultDistinctUsed、defaultReviewDuration、retryDistinctUsed |
@@ -236,8 +239,9 @@ S1 项目：D2 有相关学习 → D3 独立作答与核对 → D4 词句本主�
 | 存储 | 内容 |
 |---|---|
 | provider_selection | activeTextProvider、activeSpeechProvider、configRevision；设置页只有两类当前选择 |
-| provider_profile | providerId、类别、官方 endpoint 白名单、模型、协议、价格版本、数据政策链接 |
+| provider_profile | providerId、类别、regionGroup（只用于设置页分组）、官方 endpoint 白名单、模型、协议、价格版本、数据政策链接 |
 | capability_validation | providerId、凭据版本、能力、状态、验证模型、checkedAt、errorCode |
+| provider_disclosure | providerId、disclosureVersion、acknowledgedAt；首次使用和切换服务后对“发送什么、发给谁”的确认 |
 | credential-vault | 每家独立 ciphertext、nonce、aadVersion、keyAlias、lastFour、credentialRevision |
 
 密钥原文不进入以上数据库表。能力测试以 provider＋凭据版本＋模型＋能力区分；换 Key 后旧测试不能显示为当前已验证。

@@ -1,6 +1,6 @@
 # 实施计划、验证门槛与需求追踪
 
-> 对应 PRD v2.5.7、75 项功能；云端读取时有 55 项实现 Tickets。本文的工程工作包不另外增加产品功能，也不把设计文档当成实现验收。
+> 对应 PRD v2.5.7、75 项功能；云端读取时有 55 项实现 Tickets；Tickets 清单在云端，不在本仓库，下文的 T 编号以云端为准。本文的工程工作包不另外增加产品功能，也不把设计文档当成实现验收。
 
 ## 1. 交付顺序
 
@@ -48,21 +48,21 @@ M2 实验使用用户在实际 App 填写的 Key；本次架构编写没有读�
 
 | 编号 | 范围 | 关键场景与预期 |
 |---|---|---|
-| AC01 | 账号 | 邮箱未验证不注册；重复邮箱并发只一成功；统一登录错误；验证码过期／重发／暴力尝试；重设撤销会话 |
+| AC01 | 账号 | 邮箱未验证不注册；重复邮箱并发只一成功；统一登录错误；验证码过期／重发／暴力尝试；连续输错后暂时锁定并提示多久可再试；重设撤销会话 |
 | AC02 | 离线身份 | 首次登录联网；access 过期或账号服务停机时已有本地资格继续 M1；换号不串数据；退出清五家 Key 但保留学习 |
 | AC03 | 资料 | 正常／重复／缺课／损坏／取消／空间不足／Zip Slip／不兼容 schema；失败不损坏已装内容；旧包版本可追溯 |
 | AC04 | 课程播放 | 逐句不截字；变速不变调；整课／单句循环；飞行模式、锁屏、通知栏切句；来电／拔耳机不外放 |
 | AC05 | 词与普通跟读 | 短语整体、同形异义、多音词原句、默认三遍；不申请麦克风；分角色停顿；很顺不标掌握 |
 | AC06 | 练习事实 | 三个答案入口分别保存；先答后看与先看后答不同；跨页答案暴露纳入；无法判断不伪记错误 |
 | AC07 | 首次完成与共享 | 仅浏览不完成；手动完成不伪造独立证据；跨课 S3 保持 S3；移出不被重点词规则加回 |
-| AC08 | 时间与排期 | D0→D3 三日；21:00→次日20:00 算一日；D2/D3/D4/D5→D7，无 D4 则 D6；S3 D14 保持、D28 升 S4、D58 等；跨 04:00 恢复原轮 |
+| AC08 | 时间与排期 | D0→D3 三日；21:00→次日20:00 算一日；D2/D3/D4/D5→D7，无 D4 则 D6；S3 D14 保持、D28 升 S4、D58 等；跨 04:00 恢复原轮；跨 04:00 的一次学习整次归开始的学习日 |
 | AC09 | 单次结算 | 双击、重复自评、两个回调、迟到结果、每个事务写点进程终止；结果全成功或全失败，不能重复升档 |
-| AC10 | 结果优先级 | 完整答案／明确不会回 S0；部分提示降一；模糊低档保持高档降一；无结果保持次日复核；跳过不减负担；训练失败不降档 |
+| AC10 | 结果优先级 | 完整答案／明确不会回 S0；部分提示降一；模糊低档保持高档降一；无结果保持次日复核；跳过不减负担；训练失败不降档；跟原声读顺的“很顺／还行／要再练”按独立答对／模糊／不会结算，不进目标分母 |
 | AC11 | 推荐与计划 | 默认五分钟／十项、跨入口额度；第十一项正式继续；保护第2/5位轮换；12到期完成10剩2，跳过7剩9；恢复积压不长期挡课 |
 | AC12 | 目标与 L2 | 3/5/10目标需3/4/8；目标为空不得达标；移出不缩分母；自定义显式标记；两课完成后开放L2；至少3变式、七日重用、失败撤销／无结果保留 |
 | AC13 | 版本与删除 | 纯标点保留状态；实质答案变更新S0、旧历史保留；撤销恢复原定义；按课删共享来源；自动回退不复活删除 |
 | AC14 | 备份恢复 | 未完／已结算轮、复核、额度、保护位、移出、自定义、L2、报错、颜色一致；损坏／新schema恢复失败不替换现状；无Key和录音 |
-| AC15 | 服务设置 | 两类选择、五家Key分别保存；不定位、不自动选区；Key错误／额度／网络／权限区分；切换隔离旧结果；清理中崩溃继续清钥 |
+| AC15 | 服务设置 | 两类选择、五家Key分别保存；按境内／境外分组显示，不定位、不自动选区；首次使用和切换服务后先显示发送说明；Key错误／额度／网络／权限区分；切换隔离旧结果；清理中崩溃继续清钥 |
 | AC16 | 发音与语义 | 静音／噪声／截断不零分；无评测不显示旧分；同轮重录或自评；迟到AI不盖自评；不以发音分判独立回忆 |
 | AC17 | 对话 | 两家各十轮；六帮助、连续打断、回声、长停顿、后台／锁屏停止采集；无文本只基础回顾，文本可用才给建议 |
 | AC18 | 估费预算 | 同服务并发请求原子预留；80%提醒一次；到额禁新请求；当前轮完成后结束；超时保留费用待确认；累计usage不重加；恢复旧备份不清费用 |
@@ -104,7 +104,8 @@ Room 设备测试使用真实事务和约束，注入进程终止、磁盘满、
 |---|---|---|
 | Android 最低版本与真机 | API26为候选，按本人手机确认 | 记录系统版本、内存、音频／通知能力 |
 | 学习日跨时区／回拨 | 历史不重写、活跃轮固定归属；学习时区配置版本化 | 产品确认后加入 AC08 测试 |
-| 坚持另开旧正式轮 | 先保存既有事实，完整答案／明确失败不绕过；其他按无结果 | 核对 PRD 中另开轮与失败优先的文字口径 |
+| 坚持另开旧正式轮 | 先保存既有事实，完整答案／明确失败不绕过；其他按无结果 | PRD F08 两条文字结论不同（见总体设计第 14 节第 4 项），产品确认后固定并加入 AC10 |
+| “一次学习”的结束边界 | 用户结束当天学习，或离开前台超过固定时长；时长待定 | 产品确认后加入 AC08 测试 |
 | 预算月份与日期 | 服务币种、自然月、持久预算时区 | 产品确认后固定 monthKey 算法 |
 | 模型／价格／协议版本 | 逐家验证并固定 ProviderProfile | PV01～PV10 报告，不使用未核实模型名 |
 | 不明费用如何确认 | 仅实际响应或官方可用记录校正；否则保留待确认 | 逐家证明用量路径，不能虚构查询接口 |
@@ -115,88 +116,90 @@ Room 设备测试使用真实事务和约束，注入进程终止、磁盘满、
 
 ## 7. 需求到架构追踪
 
-以下按当前 PRD 自动提取功能编号、名称和阶段，逐项关联主要架构责任与验收组。功能分期来自 PRD，不由工作包数量反推。
+以下列出当前 PRD 的全部功能编号、名称和阶段。v1.1 起每项单独对应责任模块、设计落点和验收组，不再按模块整组套用。功能分期来自 PRD，不由工作包数量反推。
 
 <!-- FEATURE_TRACE_START -->
 | 功能 | 名称 | 阶段 | 主要责任 | 设计落点 | 验收 |
 |---|---|---|---|---|---|
-| F01-1 | 登录 | M1 | 账号客户端、账号服务、Settings、CredentialVault | 总体§4/8/10/11 | AC01/02/15/19/20 |
-| F01-2 | 注册 | M1 | 账号客户端、账号服务、Settings、CredentialVault | 总体§4/8/10/11 | AC01/02/15/19/20 |
-| F01-3 | 找回密码 | M1 | 账号客户端、账号服务、Settings、CredentialVault | 总体§4/8/10/11 | AC01/02/15/19/20 |
-| F01-4 | 首次设置 | M1 | 账号客户端、账号服务、Settings、CredentialVault | 总体§4/8/10/11 | AC01/02/15/19/20 |
-| F01-5 | 装入课程资料包 | M1 | 账号客户端、账号服务、Settings、CredentialVault | 总体§4/8/10/11 | AC01/02/15/19/20 |
-| F01-6 | 每日提醒 | M1 | 账号客户端、账号服务、Settings、CredentialVault | 总体§4/8/10/11 | AC01/02/15/19/20 |
-| F01-7 | 设置 | M1 | 账号客户端、账号服务、Settings、CredentialVault | 总体§4/8/10/11 | AC01/02/15/19/20 |
-| F01-8 | 账号管理 | M1 | 账号客户端、账号服务、Settings、CredentialVault | 总体§4/8/10/11 | AC01/02/15/19/20 |
-| F01-9 | 声音功能说明与麦克风授权 | M2 | PermissionCoordinator、AudioCoordinator | 总体§7/11 | AC16/17/20 |
-| F01-10 | 字母与拼读入门 | P1 | 入门课程内容与页面 | 总体§4/5 | AC22 |
-| F01-11 | AI 服务设置 | M2 | AiCoordinator、CredentialVault、五家Adapter | 总体§8/11；数据§8 | AC15/20；PV01～PV10 |
-| F02-1 | 课程列表 | M1 | CourseRepository、课程包、ContentVersion | 总体§5；数据§4/10 | AC03/07/13/21 |
-| F02-2 | 课程详情 | M1 | CourseRepository、课程包、ContentVersion | 总体§5；数据§4/10 | AC03/07/13/21 |
-| F02-3 | 查看原书页 | M1 | CourseRepository、课程包、ContentVersion | 总体§5；数据§4/10 | AC03/07/13/21 |
-| F02-4 | 课文报错与改正 | M1 | CourseRepository、课程包、ContentVersion | 总体§5；数据§4/10 | AC03/07/13/21 |
-| F02-5 | 加入第二至四册 | P1 | 册标识、单课单元、课程包演进 | 总体§5；数据§2/10 | AC21 |
-| F02-6 | 拍照导入其他教材 | P2 | P2拍照内容输入端口 | 总体§1/5；数据§2 | AC23 |
-| F02-7 | 其他教材资料包 | P2 | P2其他教材资料包与资源契约 | 总体§5；数据§2/4 | AC21 |
-| F03-1 | 课文显示 | M1 | CourseRepository、词典、Playback、ReviewDefinition | 总体§4/5/6/8；数据§4/5 | AC04/05/07 |
-| F03-2 | 点词与短语查义 | M1 | CourseRepository、词典、Playback、ReviewDefinition | 总体§4/5/6/8；数据§4/5 | AC04/05/07 |
-| F03-3 | 单词与重点短语发音 | M1 | CourseRepository、词典、Playback、ReviewDefinition | 总体§4/5/6/8；数据§4/5 | AC04/05/07 |
-| F03-4 | 单词跟读 | M1 | CourseRepository、词典、Playback、ReviewDefinition | 总体§4/5/6/8；数据§4/5 | AC04/05/07 |
-| F03-5 | 听原句 | M1 | CourseRepository、词典、Playback、ReviewDefinition | 总体§4/5/6/8；数据§4/5 | AC04/05/07 |
-| F03-6 | 本课生词表 | M1 | CourseRepository、词典、Playback、ReviewDefinition | 总体§4/5/6/8；数据§4/5 | AC04/05/07 |
-| F03-7 | 加入复习 | M1 | CourseRepository、词典、Playback、ReviewDefinition | 总体§4/5/6/8；数据§4/5 | AC04/05/07 |
-| F03-8 | AI 讲解 | M2 | 已核对Explanation内容 | 总体§4/5/8 | AC03/15 |
-| F03-9 | 原声单词片段 | P1 | P1词边界音频资源 | 总体§5/7 | AC22 |
-| F04-1 | 逐句播放 | M1 | AudioCoordinator、Media3、MediaSessionService | 总体§7 | AC04 |
-| F04-2 | 整课播放与循环 | M1 | AudioCoordinator、Media3、MediaSessionService | 总体§7 | AC04 |
-| F04-3 | 变速 | M1 | AudioCoordinator、Media3、MediaSessionService | 总体§7 | AC04 |
-| F04-4 | 先听后看 | M1 | AudioCoordinator、Media3、MediaSessionService | 总体§7 | AC04 |
-| F04-5 | 后台与锁屏播放 | M1 | AudioCoordinator、Media3、MediaSessionService | 总体§7 | AC04 |
-| F04-6 | 睡眠定时 | P1 | P1播放睡眠计时器 | 总体§7 | AC22 |
-| F05-1 | 逐句跟读 | M1 | AudioCoordinator、SpeechGateway、LearningCommandService | 总体§6/7/8 | AC05/15/16 |
-| F05-2 | 影子跟读 | M1 | AudioCoordinator、SpeechGateway、LearningCommandService | 总体§6/7/8 | AC05/15/16 |
-| F05-3 | 分角色跟读 | M1 | AudioCoordinator、SpeechGateway、LearningCommandService | 总体§6/7/8 | AC05/15/16 |
-| F05-4 | 跟读自评 | M1 | AudioCoordinator、SpeechGateway、LearningCommandService | 总体§6/7/8 | AC05/15/16 |
-| F05-5 | 检查发音 | M2 | AudioCoordinator、SpeechGateway、LearningCommandService | 总体§6/7/8 | AC05/15/16 |
-| F05-6 | 发音反馈与重练 | M2 | AudioCoordinator、SpeechGateway、LearningCommandService | 总体§6/7/8 | AC05/15/16 |
-| F05-7 | 录音回放与对比 | P1 | P1主动本机录音与导出 | 总体§7/11/12 | AC22/20 |
-| F06-1 | 课内角色扮演 | M2 | ConversationCoordinator、SpeechGateway、TextGateway | 总体§7/8/9 | AC17/18/20 |
-| F06-2 | 综合场景任务 | M2 | ConversationCoordinator、SpeechGateway、TextGateway | 总体§7/8/9 | AC17/18/20 |
-| F06-3 | 日常聊天 | M2 | ConversationCoordinator、SpeechGateway、TextGateway | 总体§7/8/9 | AC17/18/20 |
-| F06-4 | 辅助按钮 | M2 | ConversationCoordinator、SpeechGateway、TextGateway | 总体§7/8/9 | AC17/18/20 |
-| F06-5 | 打断 | M2 | ConversationCoordinator、SpeechGateway、TextGateway | 总体§7/8/9 | AC17/18/20 |
-| F06-6 | 对话回顾 | M2 | ConversationCoordinator、SpeechGateway、TextGateway | 总体§7/8/9 | AC17/18/20 |
-| F06-7 | 个性化话题 | P1 | P1个性化内容与对话策略 | 总体§8 | AC22 |
-| F07-1 | 听力问题 | M1 | PracticeUseCase、LearningCommandService、L2 | 总体§6/8；数据§6/7 | AC06/09/12/16 |
-| F07-2 | 看中文说英文 | M1 | PracticeUseCase、LearningCommandService、L2 | 总体§6/8；数据§6/7 | AC06/09/12/16 |
-| F07-3 | 看图与换情境练习 | M1 | PracticeUseCase、LearningCommandService、L2 | 总体§6/8；数据§6/7 | AC06/09/12/16 |
-| F07-4 | 遮盖背诵与复述 | M2 | 本机文本遮盖与复述用例 | 总体§4/6 | AC06/22 |
-| F07-5 | 口头回答自动判断 | M2 | SpeechRecognition＋TextJudgement | 总体§8/9 | AC16/18；PV09 |
-| F07-6 | 听写 | P1 | P1听写用例与本地答案比对 | 总体§4/5 | AC22 |
-| F08-1 | 每日复习 | M1 | ReviewPolicy、Round、Quota、ItemSource | 总体§6；数据§5/6/7 | AC07/08/09/10/11 |
-| F08-2 | 自动加入复习 | M1 | ReviewPolicy、Round、Quota、ItemSource | 总体§6；数据§5/6/7 | AC07/08/09/10/11 |
-| F08-3 | 回忆式复习 | M1 | ReviewPolicy、Round、Quota、ItemSource | 总体§6；数据§5/6/7 | AC07/08/09/10/11 |
-| F08-4 | 生词本与句子本 | M1 | ReviewPolicy、Round、Quota、ItemSource | 总体§6；数据§5/6/7 | AC07/08/09/10/11 |
-| F08-5 | 积压处理 | M1 | ReviewPolicy、Round、Quota、ItemSource | 总体§6；数据§5/6/7 | AC07/08/09/10/11 |
-| F08-6 | 结合语音结果复习 | M2 | 语音薄弱项的ItemSource与主要能力 | 总体§6/8；数据§5 | AC07/16/17 |
-| F09-1 | 今日计划 | M1 | PlanPolicy、DailyPlan、RecoveryBatch | 总体§4/6；数据§7 | AC11/21 |
-| F09-2 | 一键开始与继续 | M1 | PlanPolicy、DailyPlan、RecoveryBatch | 总体§4/6；数据§7 | AC11/21 |
-| F09-3 | 中断恢复 | M1 | PlanPolicy、DailyPlan、RecoveryBatch | 总体§4/6；数据§7 | AC11/21 |
-| F09-4 | 加入语音任务 | M2 | AiAvailability＋PlanPolicy | 总体§4/9 | AC11/15/18 |
-| F09-5 | 计划自动调整 | P1 | P1计划调整策略版本 | 总体§6；数据§7 | AC22 |
-| F10-1 | 学习日历 | M1 | MasteryPolicy、Evidence、UnitStatus、StudySession | 总体§6/7；数据§7 | AC12/13/17 |
-| F10-2 | 课程状态 | M1 | MasteryPolicy、Evidence、UnitStatus、StudySession | 总体§6/7；数据§7 | AC12/13/17 |
-| F10-3 | 开口时长 | M2 | 前台录音VAD与时长估计 | 总体§7；数据§7 | AC17 |
-| F10-4 | 每周小结 | P1 | P1学习记录汇总 | 总体§6；数据§7 | AC22 |
-| F10-5 | 月度口语任务 | P1 | P1等难度口语任务 | 总体§6/7 | AC22 |
-| F11-1 | 本地保存与离线使用 | M1 | Room事实源与离线身份 | 总体§4/10；数据§1 | AC02/09 |
-| F11-2 | 备份与恢复 | M1 | BackupCoordinator与逻辑快照 | 总体§12；数据§10 | AC14/20 |
+| F01-1 | 登录 | M1 | 账号客户端、Session、离线身份 | 总体§10.2/10.3；数据§9 | AC01/02 |
+| F01-2 | 注册 | M1 | Registration、EmailOutbox | 总体§10.1/10.2；数据§9 | AC01 |
+| F01-3 | 找回密码 | M1 | PasswordRecovery、EmailOutbox | 总体§10.2；数据§9 | AC01 |
+| F01-4 | 首次设置 | M1 | Settings 用例、PlanPolicy（每日时长）、本地示范播放 | 总体§4.1/6.6；数据§7 | AC02/19 |
+| F01-5 | 装入课程资料包 | M1 | CourseRepository、包装入状态机、PackSource | 总体§5.1/5.3；数据§4.1 | AC03 |
+| F01-6 | 每日提醒 | M1 | ReminderScheduler | 总体§4.3 | AC19 |
+| F01-7 | 设置 | M1 | Settings、DataStore 显示偏好、学习库中的调度设置 | 总体§3.1/4.1；数据§1 | AC19 |
+| F01-8 | 账号管理 | M1 | AccountManagement、本机清理流程 | 总体§10.2/10.3/11.1；数据§9 | AC01/02/15 |
+| F01-9 | 声音功能说明与麦克风授权 | M2 | PermissionCoordinator、AudioCoordinator、发送说明确认 | 总体§7.1/8.1 | AC16/17/20 |
+| F01-10 | 字母与拼读入门 | P1 | 入门课程内容与页面 | 总体§5 | AC22 |
+| F01-11 | AI 服务设置 | M2 | AiCoordinator、CredentialVault、五家 Adapter | 总体§8/11.1；数据§8.1 | AC15/20；PV01～PV10 |
+| F02-1 | 课程列表 | M1 | CourseRepository、unit_status 投影 | 总体§5.1；数据§4.1/7 | AC03/12 |
+| F02-2 | 课程详情 | M1 | CourseRepository、lesson_step_progress | 总体§5.1；数据§4.2 | AC07 |
+| F02-3 | 查看原书页 | M1 | CourseRepository、扫描图片资源 | 总体§5.1；数据§4.1 | AC03 |
+| F02-4 | 课文报错与改正 | M1 | content_override、content_issue、definition_mapping | 总体§5.3；数据§4.2/10.1 | AC13 |
+| F02-5 | 加入第二至四册 | P1 | 册标识、单课单元、课程包演进 | 总体§5.1；数据§2/10.1 | AC21 |
+| F02-6 | 拍照导入其他教材 | P2 | 拍照内容输入端口（仅预留） | 总体§1.2/5.1 | AC23 |
+| F02-7 | 其他教材资料包 | P2 | 资料包最小资源契约、PackSource | 总体§5.1；数据§2/4.1 | AC21 |
+| F03-1 | 课文显示 | M1 | CourseRepository、sentence | 总体§4.1/5.1；数据§4.1 | AC04 |
+| F03-2 | 点词与短语查义 | M1 | 词典索引、vocabulary_entry、phrase_span | 数据§4.1 | AC05 |
+| F03-3 | 单词与重点短语发音 | M1 | Playback（离线合成示范） | 总体§5.2/7.1 | AC05 |
+| F03-4 | 单词跟读 | M1 | Playback、AudioCoordinator（不采集） | 总体§7.1 | AC05 |
+| F03-5 | 听原句 | M1 | Playback、sentence_audio | 总体§7.1；数据§4.1 | AC04/05 |
+| F03-6 | 本课生词表 | M1 | vocabulary_entry、Playback | 数据§4.1 | AC05 |
+| F03-7 | 加入复习 | M1 | LearningCommandService、REVIEW_DEFINITION、item_source | 总体§6.1；数据§5.1 | AC07 |
+| F03-8 | AI 讲解 | M2 | 已核对的 explanation 内容 | 总体§4.2/5.1；数据§4.1 | AC03 |
+| F03-9 | 原声单词片段 | P1 | 词边界音频资源 | 总体§5.2 | AC22 |
+| F04-1 | 逐句播放 | M1 | Media3、sentence_audio | 总体§7.1；数据§4.1 | AC04 |
+| F04-2 | 整课播放与循环 | M1 | Media3 | 总体§7.1 | AC04 |
+| F04-3 | 变速 | M1 | Media3 | 总体§7.1 | AC04 |
+| F04-4 | 先听后看 | M1 | 听读页 UiState、lesson_step_progress | 总体§4.1；数据§4.2 | AC04 |
+| F04-5 | 后台与锁屏播放 | M1 | MediaSessionService、AudioCoordinator | 总体§7.1 | AC04 |
+| F04-6 | 睡眠定时 | P1 | 播放睡眠计时器 | 总体§7.1 | AC22 |
+| F05-1 | 逐句跟读 | M1 | Playback、AudioCoordinator（不采集） | 总体§7.1 | AC05 |
+| F05-2 | 影子跟读 | M1 | Playback、AudioCoordinator（不采集） | 总体§7.1 | AC05 |
+| F05-3 | 分角色跟读 | M1 | Playback、sentence.speaker | 总体§7.1；数据§4.1 | AC05 |
+| F05-4 | 跟读自评 | M1 | LearningCommandService、SHADOW_FLUENCY 项目 | 总体§6.3/6.4；数据§5.1/5.4 | AC05/10 |
+| F05-5 | 检查发音 | M2 | AudioCoordinator、PronunciationFeedback 适配 | 总体§7.2/8.3 | AC16；PV08 |
+| F05-6 | 发音反馈与重练 | M2 | PronunciationResult、核对过的发音练法 | 总体§8.3 | AC16；PV08 |
+| F05-7 | 录音回放与对比 | P1 | 主动本机录音与导出 | 总体§7.4/11 | AC22/20 |
+| F06-1 | 课内角色扮演 | M2 | ConversationCoordinator、SpeechConversation | 总体§7.3/8/9 | AC17/18/20；PV04/05 |
+| F06-2 | 综合场景任务 | M2 | ConversationCoordinator、SpeechConversation | 总体§7.3/8/9 | AC17/18/20；PV04/05 |
+| F06-3 | 日常聊天 | M2 | ConversationCoordinator、SpeechConversation | 总体§7.3/8/9 | AC17/18/20；PV04/05 |
+| F06-4 | 辅助按钮 | M2 | ConversationCoordinator | 总体§7.3 | AC17 |
+| F06-5 | 打断 | M2 | AudioCoordinator、generation 隔离 | 总体§7.3 | AC17；PV04/05 |
+| F06-6 | 对话回顾 | M2 | TextSuggestion、conversation_turn | 总体§4.2/7.4/8.5；数据§8.2 | AC17；PV09 |
+| F06-7 | 个性化话题 | P1 | 个性化内容与对话策略 | 总体§8 | AC22 |
+| F07-1 | 听力问题 | M1 | PracticeUseCase、LearningCommandService | 总体§6.3～6.5；数据§6 | AC06/09 |
+| F07-2 | 看中文说英文 | M1 | PracticeUseCase、LearningCommandService | 总体§6.3～6.5；数据§6 | AC06/09 |
+| F07-3 | 看图与换情境练习 | M1 | PracticeUseCase、L2 变式与证据 | 总体§6.7；数据§7 | AC06/12 |
+| F07-4 | 遮盖背诵与复述 | M2 | 本机文本遮盖与复述用例 | 总体§4.2 | AC06 |
+| F07-5 | 口头回答自动判断 | M2 | SpeechRecognition＋TextJudgement | 总体§8.2/8.5/9 | AC16/18；PV06/07/09 |
+| F07-6 | 听写 | P1 | 听写用例与本地答案比对 | 总体§4/5 | AC22 |
+| F08-1 | 每日复习 | M1 | ReviewPolicy、ROUND、daily_quota | 总体§6.4～6.6；数据§5/6/7 | AC08/09/10/11 |
+| F08-2 | 自动加入复习 | M1 | REVIEW_DEFINITION、item_source | 总体§6.1；数据§5.1 | AC07 |
+| F08-3 | 回忆式复习 | M1 | ROUND、三种 primaryAbility | 总体§6.3/6.4；数据§5.1/6 | AC06/10 |
+| F08-4 | 生词本与句子本 | M1 | REVIEW_STATE、移出标记 | 总体§6.1；数据§5.2 | AC07/11 |
+| F08-5 | 积压处理 | M1 | PlanPolicy、recovery_batch | 总体§6.6；数据§7 | AC11 |
+| F08-6 | 结合语音结果复习 | M2 | 语音薄弱项的 item_source 与主要能力 | 总体§6/8；数据§5 | AC16/17 |
+| F09-1 | 今日计划 | M1 | PlanPolicy、daily_plan | 总体§4.2/6.6；数据§7 | AC11 |
+| F09-2 | 一键开始与继续 | M1 | plan_task、轮次恢复 | 总体§6.3；数据§7 | AC09/11 |
+| F09-3 | 中断恢复 | M1 | PlanPolicy、recovery_batch | 总体§6.6；数据§7 | AC11 |
+| F09-4 | 加入语音任务 | M2 | AvailableAction＋PlanPolicy | 总体§4.2/9 | AC11/15/18 |
+| F09-5 | 计划自动调整 | P1 | 计划调整策略版本 | 总体§6；数据§7 | AC22 |
+| F10-1 | 学习日历 | M1 | study_session、学习事件汇总 | 总体§6.2；数据§7 | AC08/11 |
+| F10-2 | 课程状态 | M1 | MasteryPolicy、item_evidence、unit_status | 总体§6.7；数据§7 | AC12/13 |
+| F10-3 | 开口时长 | M2 | 前台录音 VAD 与时长估计 | 总体§7；数据§7 | AC17 |
+| F10-4 | 每周小结 | P1 | 学习记录汇总 | 总体§6；数据§7 | AC22 |
+| F10-5 | 月度口语任务 | P1 | 等难度口语任务 | 总体§6/7 | AC22 |
+| F11-1 | 本地保存与离线使用 | M1 | Room 事实源与离线身份 | 总体§4/10.3；数据§1 | AC02/09 |
+| F11-2 | 备份与恢复 | M1 | BackupCoordinator 与逻辑快照 | 总体§12；数据§10 | AC14/20 |
 | F11-3 | 删除数据 | M1 | 按来源删除与删除代际 | 总体§12；数据§10 | AC13/14 |
 | F11-4 | 升级不丢数据 | M1 | 显式数据库迁移与升级保护 | 总体§12；数据§10 | AC09/13/14 |
 | F11-5 | 费用与预算 | M2 | 请求账本、用量估算、预算预留 | 总体§9；数据§8 | AC18；PV10 |
-| F11-6 | 多设备同步 | P2 | P2同步接口与身份预留 | 总体§1/14；数据§2 | AC23 |
+| F11-6 | 多设备同步 | P2 | 同步接口与身份预留 | 总体§1/14；数据§2 | AC23 |
 <!-- FEATURE_TRACE_END -->
 
 ## 8. 本次文档核验范围
 
 本次完成需求阅读、官方资料检索、架构编写及文档结构／引用／功能覆盖核验。尚未创建 Android 或后端工程，未运行真实语音、费用、手机音频或迁移测试。实施中每次关闭一个验证门槛，应将报告路径与实测版本补充进本文件，避免“已写设计”变成“已通过验收”。
+
+v1.1 的审核修订只改文档：对照 PRD v2.5.7 补齐遗漏、统一命名并重排第 7 节追踪表，没有新增实验或实测结论。
