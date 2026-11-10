@@ -1,4 +1,4 @@
-// 新视觉方案 · 核心页（PRD v2.5.6）。尺寸按 Android 390 × 844 dp，1px = 1dp。其余页面在 pages.js，共用这里的组件。
+// 新视觉方案 · 核心页（PRD v2.5.7）。尺寸按 Android 390 × 844 dp，1px = 1dp。其余页面在 pages.js，共用这里的组件。
 const sbar = () => `<div class="sbar"><span>16:20</span><span class="ic"><i class="ti ti-wifi"></i><i class="ti ti-antenna-bars-5"></i><i class="ti ti-battery-3"></i></span></div>`;
 
 const nav = (on) => `<nav class="nav">${[['today', '今日', 'ti-sun'], ['courses', '课程', 'ti-books'], ['speaking', '口语', 'ti-messages'], ['review', '复习', 'ti-cards']]

@@ -393,14 +393,16 @@ const backupInner = () => `${sbar()}${abar('数据与备份')}<div class="pad">
 ${row(null, null, '同时包含课程资料包', '约 140 MB，默认不含', '<i class="switch"></i>', 'box')}</div>
 <div class="fill"></div><div class="dock"><button class="btn pri"><i class="ti ti-download"></i>导出备份</button><div class="two"><button class="btn sec">从备份恢复</button><button class="btn sec danger-t">删除学习数据</button></div><p class="note">导出后建议另存到电脑或其他设备</p></div>`;
 
+const USING = `<span class="chip sm tint" style="${T('review')}">使用中</span>${GO}`;
+const OKC = '<i class="ti ti-circle-check okc"></i>';
 const settings = [
   {
     id: 'settings', name: '设置', note: '从今日页头像进入',
-    render: () => `<div class="screen">${sbar()}${abar('设置')}<div class="pad">
+    render: () => `<div class="screen">${sbar()}${abar('设置')}<div class="pad set">
 <div class="li box prof"><div class="me">L</div><div class="tx"><b>leon</b><span>leon@example.com · 账号与安全</span></div>${GO}</div>
 <p class="grp-t">学习</p><div class="list">${row(null, null, '每日时长', '', val('60 分钟'))}${row(null, null, '每日提醒', '20:30 · 每天最多一次', '<i class="switch on"></i>')}${row(null, null, '中文显示', '', val('点开显示'))}${row(null, null, '跟读停顿', '', val('句长 1.5 倍'))}${row(null, null, '默认语速', '', val('1.0×'))}</div>
 <p class="grp-t">显示</p><div class="list">${row(null, null, '字体大小', '', val('标准'))}${row(null, null, '学习颜色', '', cdots)}</div>
-<p class="grp-t">数据与费用</p><div class="list">${row(null, null, '数据与备份', '', val('今天已备份'))}${row(null, null, '费用与预算', 'M2 语音功能', val('¥8.6 / ¥30'))}</div></div></div>`,
+<p class="grp-t">数据与 AI 服务</p><div class="list">${row(null, null, '数据与备份', '', val('今天已备份'))}${row(null, null, 'AI 服务', '', val('豆包 · 智谱'))}${row(null, null, '费用与预算', '', val('¥8.6 / ¥30'))}</div></div></div>`,
   },
   {
     id: 'backup', name: '数据与备份', note: '手动导出，默认不含资料包',
@@ -433,11 +435,28 @@ ${nt('ti-info-circle', '之后如果恢复删除前的备份，会先提醒你�
 ${nt('ti-info-circle', '登录其他账号前，会先提示备份并清除本机数据。')}</div></div>`,
   },
   {
+    id: 'ai-services', name: 'AI 服务', note: '自己填密钥，按地区选服务', stage: 'M2',
+    render: () => `<div class="screen">${sbar()}${abar('AI 服务', '<span class="chip sm">M2</span>')}<div class="pad">
+${nt('ti-lock', '密钥只保存在这台手机上，不上传、不进备份。费用由服务商直接向你收取。')}
+<p class="grp-t">语音服务 · 对话、发音检查</p><div class="list">${row('ti-microphone', 'speak', '豆包', '中国境内 · 密钥 ····3f9a', USING)}${row('ti-microphone', null, 'Gemini', '境外', val('未填写'))}</div>
+<p class="grp-t">文本服务 · 判断回答、表达建议</p><div class="list">${row('ti-message-2', 'practice', '智谱', '中国境内 · 密钥 ····a71c', USING)}${row('ti-message-2', null, 'OpenAI（GPT）', '境外', val('未填写'))}${row('ti-message-2', null, 'Claude', '境外 · 密钥 ····9d02', val('已填写'))}</div>
+<p class="hint-n" style="margin:14px 4px 0">换地区时在这里切换服务，各家密钥分开保存，不用重填。App 不读取定位。</p></div></div>`,
+  },
+  {
+    id: 'ai-key', name: 'AI 服务 · 填写密钥', note: '测试连接，结果分项显示', stage: 'M2',
+    render: () => `<div class="screen">${sbar()}${abar('豆包 · 语音服务', '<span class="chip sm">中国境内</span>')}<div class="pad">
+${fld('密钥（API Key）', '<span class="dots">••••••••••••3f9a</span><i class="ti ti-eye-off end"></i>')}
+<p class="hint-n" style="margin:8px 4px 0">密钥在服务商的控制台里创建。填好后只显示末 4 位。</p>
+<p class="grp-t">测试结果 · 刚刚</p><div class="list">${row(null, null, '密钥有效', '', OKC)}${row(null, null, '实时语音对话', '可以打断', OKC)}${row(null, null, '语音识别', '', OKC)}${row(null, null, '发音检查', '这家服务只能指出到单词', '<i class="ti ti-alert-circle warnc"></i>')}</div>
+${nt('ti-coin', '测试会产生一次很小的真实调用，费用由豆包向你收取。')}</div>
+<div class="fill"></div><div class="dock"><button class="btn pri">重新测试连接</button><div class="two"><button class="btn sec">更换密钥</button><button class="btn sec" style="color:var(--danger-deep)">删除密钥</button></div></div></div>`,
+  },
+  {
     id: 'budget', name: '费用与预算', note: '本月估算和明细', stage: 'M2',
     render: () => `<div class="screen">${sbar()}${abar('费用与预算', '<span class="chip sm">M2</span>')}<div class="pad">
 <div class="card"><span class="lb">本月估算费用</span><div class="bud-n"><b>¥8.6</b><span>/ 每月预算 ¥30</span></div><div class="bar lg"><i style="width:29%;background:var(--ink)"></i><em style="left:80%"></em></div><div class="bud-l"><span>已用 29%</span><span>用到 80% 时提醒</span></div></div>
-<p class="grp-t">本月明细</p><div class="list">${[['ti-ear', '语音识别', '42 分钟', '¥5.2'], ['ti-microphone', '发音评测', '18 次', '¥2.1'], ['ti-messages', 'AI 对话', '3 段', '¥1.3']].map(([ic, t, s, v]) => row(ic, null, t, s, `<span class="v">${v}</span>`)).join('')}</div>
-${nt('ti-shield-check', '达到预算后暂停付费语音功能，不会自动购买或续费；普通学习不受影响。')}</div>
+<p class="grp-t">本月明细</p><div class="list">${[['ti-messages', 'AI 对话 · 豆包', '3 段 · 42 分钟', '¥5.2'], ['ti-microphone', '发音检查 · 豆包', '18 次', '¥2.1'], ['ti-message-2', '判断与建议 · 智谱', '26 次', '¥1.3']].map(([ic, t, s, v]) => row(ic, null, t, s, `<span class="v">${v}</span>`)).join('')}</div>
+${nt('ti-shield-check', '费用按本机用量估算，以服务商账单为准。达到预算后暂停付费语音功能，普通学习不受影响。')}</div>
 <div class="fill"></div><div class="dock"><button class="btn sec">调整每月预算</button></div></div>`,
   },
   {
@@ -461,5 +480,5 @@ export const groups = [
   ['跟读与练习', ['speaking', 'follow', 'shadow', 'role', 'practice', 'practice-hint', 'practice-answer', 'scenario']],
   ['发音与 AI 对话 · M2', ['pronunciation', 'pronunciation-feedback', 'chat', 'chat-paused', 'chat-review']],
   ['复习与记录', ['review', 'review-answer', 'review-empty', 'words', 'sentences', 'calendar', 'course-status', 'weekly']],
-  ['设置与账号', ['settings', 'colors', 'backup', 'restore', 'delete', 'account', 'budget', 'budget-limit']],
+  ['设置与账号', ['settings', 'colors', 'backup', 'restore', 'delete', 'account', 'ai-services', 'ai-key', 'budget', 'budget-limit']],
 ];
